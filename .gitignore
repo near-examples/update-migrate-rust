@@ -6,9 +6,9 @@ node_modules
 .pnp.js
 
 # build
-/out
-/dist
-/target
+**/out
+**/dist
+**/target
 
 # keys
 /templates/react/neardev
