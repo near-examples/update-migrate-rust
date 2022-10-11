@@ -18,12 +18,11 @@ test.beforeEach(async (t) => {
   const guestBook = await root.createSubAccount("guesbook");
 
   // Get wasm file path from package.json test script in folder above
-  await guestBook.deploy("./base/target/wasm32-unknown-unknown/release/base.wasm");
+  await guestBook.deploy("./contracts/target/wasm32-unknown-unknown/release/base.wasm");
 
   // add messages
-  await guestBook.call(guestBook, "add_message", { text: "hola" });
-  await alice.call(guestBook, "add_message", { text: "adios" }, { attachedDeposit: NEAR.parse('1') });
-
+  await guestBook.call(guestBook, "add_message", { text: "hello" });
+  await alice.call(guestBook, "add_message", { text: "bye" }, { attachedDeposit: NEAR.parse('1') });
 
   // Save state for test runs, it is unique for each test
   t.context.worker = worker;
@@ -37,35 +36,56 @@ test.afterEach(async (t) => {
   });
 });
 
-test("by default it gives the messages two total", async (t) => {
+test("by default it return the two messages", async (t) => {
   const { guestBook, alice } = t.context.accounts;
 
   const msgs = await guestBook.view("get_messages");
 
   const expected = [
-    { premium: false, sender: guestBook.accountId, text: "hola" },
-    { premium: true, sender: alice.accountId, text: "adios" },
+    { premium: false, sender: guestBook.accountId, text: "hello" },
+    { premium: true, sender: alice.accountId, text: "bye" },
   ];
 
   t.deepEqual(msgs, expected);
 });
 
-test("after the migration there is payment information", async (t) => {
+test("first-migration adds payments structure", async (t) => {
   const { guestBook, alice } = t.context.accounts;
 
-  await guestBook.deploy("./first-update/target/wasm32-unknown-unknown/release/first_update.wasm");
+  await guestBook.deploy("./contracts/target/wasm32-unknown-unknown/release/first_update.wasm");
   await guestBook.call(guestBook, "migrate", {});
 
   const msgs = await guestBook.view("get_messages");
   const payments = await guestBook.view("get_payments");
 
   const expected_msgs = [
-    { premium: false, sender: guestBook.accountId, text: "hola" },
-    { premium: true, sender: alice.accountId, text: "adios" },
+    { premium: false, sender: guestBook.accountId, text: "hello" },
+    { premium: true, sender: alice.accountId, text: "bye" },
   ];
 
   const expected_payments = ["0", NEAR.parse("0.1").toString()];
 
   t.deepEqual(msgs, expected_msgs);
   t.deepEqual(payments, expected_payments);
+});
+
+test("second-migration removes payments and updates PostedMessages", async (t) => {
+  const { guestBook, alice } = t.context.accounts;
+
+  await guestBook.deploy("./contracts/target/wasm32-unknown-unknown/release/first_update.wasm");
+  await guestBook.call(guestBook, "migrate", {});
+
+  await guestBook.deploy("./contracts/target/wasm32-unknown-unknown/release/second_update.wasm");
+  await guestBook.call(guestBook, "migrate", {});
+
+  await t.throwsAsync(guestBook.view("get_payments"));
+
+  const msgs = await guestBook.view("get_messages");
+
+  const expected = [
+    { payment: 0, premium: false, sender: guestBook.accountId, text: "hello" },
+    { payment: 1e+23, premium: true, sender: alice.accountId, text: "bye" },
+  ];
+
+  t.deepEqual(msgs, expected)
 });
