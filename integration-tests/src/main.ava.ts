@@ -89,3 +89,18 @@ test("second-migration removes payments and updates PostedMessages", async (t) =
 
   t.deepEqual(msgs, expected)
 });
+
+test("a partial migration can be done with enums", async (t) => {
+  const { guestBook, alice } = t.context.accounts;
+
+  await guestBook.deploy("./contracts/target/wasm32-unknown-unknown/release/enums.wasm");
+
+  const msgs = await guestBook.view("get_messages");
+
+  const expected = [
+    { payment: 0, premium: false, sender: guestBook.accountId, text: "hello" },
+    { payment: 1e+23, premium: true, sender: alice.accountId, text: "bye" },
+  ];
+
+  t.deepEqual(msgs, expected)
+});
