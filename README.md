@@ -106,4 +106,4 @@ npm test
 ---
 
 # Learn More
-2. Check [**our documentation**](https://docs.near.org/develop/welcome).
+1. Check [**our documentation**](https://docs.near.org/develop/welcome).
