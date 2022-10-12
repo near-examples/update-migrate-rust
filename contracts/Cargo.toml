@@ -1,0 +1,16 @@
+[profile.release]
+codegen-units = 1
+opt-level = "z"
+lto = true
+debug = false
+panic = "abort"
+overflow-checks = true
+
+[workspace]
+members = [
+    "basic-updates/base",
+    "basic-updates/first-update",
+    "basic-updates/second-update",
+    "enum-updates/base",
+    "enum-updates/update",
+]
