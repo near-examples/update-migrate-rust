@@ -22,7 +22,7 @@ test.beforeEach(async (t) => {
 
   // add messages
   await guestBook.call(guestBook, "add_message", { text: "hello" });
-  await alice.call(guestBook, "add_message", { text: "bye" }, { attachedDeposit: NEAR.parse('1') });
+  await alice.call(guestBook, "add_message", { text: "bye" }, { attachedDeposit: NEAR.parse('0.1') });
 
   // Save state for test runs, it is unique for each test
   t.context.worker = worker;
@@ -36,24 +36,8 @@ test.afterEach(async (t) => {
   });
 });
 
-test("by default it return the two messages", async (t) => {
+test("by default it return the two messages and their payments", async (t) => {
   const { guestBook, alice } = t.context.accounts;
-
-  const msgs = await guestBook.view("get_messages");
-
-  const expected = [
-    { premium: false, sender: guestBook.accountId, text: "hello" },
-    { premium: true, sender: alice.accountId, text: "bye" },
-  ];
-
-  t.deepEqual(msgs, expected);
-});
-
-test("first-migration adds payments structure", async (t) => {
-  const { guestBook, alice } = t.context.accounts;
-
-  await guestBook.deploy("./contracts/target/wasm32-unknown-unknown/release/first_update.wasm");
-  await guestBook.call(guestBook, "migrate", {});
 
   const msgs = await guestBook.view("get_messages");
   const payments = await guestBook.view("get_payments");
@@ -69,13 +53,10 @@ test("first-migration adds payments structure", async (t) => {
   t.deepEqual(payments, expected_payments);
 });
 
-test("second-migration removes payments and updates PostedMessages", async (t) => {
+test("the migration removes payments and updates PostedMessages", async (t) => {
   const { guestBook, alice } = t.context.accounts;
 
-  await guestBook.deploy("./contracts/target/wasm32-unknown-unknown/release/first_update.wasm");
-  await guestBook.call(guestBook, "migrate", {});
-
-  await guestBook.deploy("./contracts/target/wasm32-unknown-unknown/release/second_update.wasm");
+  await guestBook.deploy("./contracts/target/wasm32-unknown-unknown/release/update.wasm");
   await guestBook.call(guestBook, "migrate", {});
 
   await t.throwsAsync(guestBook.view("get_payments"));

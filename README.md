@@ -106,4 +106,5 @@ npm test
 ---
 
 # Learn More
-1. Check [**our documentation**](https://docs.near.org/develop/welcome).
+1. Learn more on each contract's [README](./contract/README.md).
+2. Check [**our documentation**](https://docs.near.org/develop/welcome).

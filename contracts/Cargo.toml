@@ -9,8 +9,7 @@ overflow-checks = true
 [workspace]
 members = [
     "basic-updates/base",
-    "basic-updates/first-update",
-    "basic-updates/second-update",
+    "basic-updates/update",
     "enum-updates/base",
     "enum-updates/update",
 ]
