@@ -1,8 +1,11 @@
-# State Migration Example
+# State Migration
+[![](https://img.shields.io/badge/⋈%20Examples-Intermediate-orange)](https://docs.near.org/tutorials/welcome)
+[![](https://img.shields.io/badge/Contract-rust-red)](https://docs.near.org/develop/contracts/anatomy)
+[![](https://img.shields.io/badge/Frontend-None-gray)](https://docs.near.org/develop/integrate/frontend)
+[![](https://img.shields.io/badge/Testing-passing-green)](https://docs.near.org/develop/integrate/frontend)
 
-This example shows how to perform a [state migration](https://docs.near.org/develop/upgrade/migration).
 
-It is divided in two major examples:
+Two examples on how to handle [state migration](https://docs.near.org/develop/upgrade/migration):
 1. State Migration: How to implement a `migrate` method to migrate state between contract updates.
 2. State Versions: How to use readily use versioning on a state, to simplify updating it later.
 
