@@ -40,8 +40,13 @@ pub fn add_message(&mut self, text: String) {
 You can automatically compile and deploy the contract in the NEAR testnet by running:
 
 ```bash
-# run from project-root/contracts
-# DELETE the project-root/contracts/neardev folder if present
+# build all examples, run from project-root/contracts
+./build.sh
+
+# delete the project-root/contracts/neardev folder if present
+# rm -rf ./neardev
+
+# deploy enum base contract
 near dev-deploy --wasmFile target/wasm32-unknown-unknown/release/enums_base.wasm
 ```
 
@@ -57,9 +62,7 @@ cat ./neardev/dev-account # e.g. dev-X-Y
 near call <dev-account> add_message '{"text": "a message"}' --amount 0.1 --accountId <account>
 ```
 
-## 3. Retrieve the Stored Messages
-`get_messages` and `get_payments` are read-only method (`view` method)
-
+## 3. Retrieve the Messages
 ```bash
-near view <dev-account> get_messages '{"from_index": "0", "limit":10}'
+near view <dev-account> get_messages
 ```

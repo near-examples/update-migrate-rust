@@ -47,8 +47,8 @@ near call <dev-account> add_message '{"text": "a message"}' --amount 0.1 --accou
 `get_messages` and `get_payments` are read-only method (`view` method)
 
 ```bash
-near view <dev-account> get_messages '{"from_index": "0", "limit":10}'
-near view <dev-account> get_payments '{"from_index": "0", "limit":10}'
+near view <dev-account> get_messages
+near view <dev-account> get_payments
 ```
 
 

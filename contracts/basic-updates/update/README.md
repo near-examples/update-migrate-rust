@@ -68,7 +68,7 @@ You can deploy the updated contract by running:
 near deploy <dev-account> --wasmFile target/wasm32-unknown-unknown/release/update.wasm
 
 # run this command to see the "Cannot deserialize..." error
-near view <dev-account> get_messages '{"from_index":0, "limit":10}'
+near view <dev-account> get_messages
 
 # Ask the contract to migrate the state
 near call <dev-account> migrate {} --accountId <dev-account>
@@ -86,12 +86,12 @@ near deploy <dev-account> --wasmFile target/wasm32-unknown-unknown/release/updat
 `get_messages` will now return messages that include a `payment` field.
 
 ```bash
-near view <dev-account> get_messages '{"from_index":0, "limit":10}'
+near view <dev-account> get_messages
 ```
 
 `get_payments` will raise an error since the method does not exist anymore.
 
 ```bash
 # raises an error since the method is gone
-near view <dev-account> get_payments '{"from_index": "0", "limit":10}'
+near view <dev-account> get_payments
 ```

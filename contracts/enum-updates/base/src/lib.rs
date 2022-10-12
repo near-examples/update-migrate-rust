@@ -29,7 +29,7 @@ impl GuestBook {
     pub fn add_message(&mut self, text: String) {
         let payment = env::attached_deposit();
         let sender = env::predecessor_account_id();
-        let premium = payment > POINT_ONE;
+        let premium = payment >= POINT_ONE;
         let message = VersionedPostedMessage::V1(PostedMessageV1 {
             sender,
             premium,

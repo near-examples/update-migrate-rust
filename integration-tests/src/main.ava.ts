@@ -21,7 +21,7 @@ test.beforeEach(async (t) => {
   await guestBook.deploy("./contracts/target/wasm32-unknown-unknown/release/base.wasm");
 
   // add messages
-  await guestBook.call(guestBook, "add_message", { text: "hello" });
+  await guestBook.call(guestBook, "add_message", { text: "hello" }, { attachedDeposit: NEAR.parse('0.09') });
   await alice.call(guestBook, "add_message", { text: "bye" }, { attachedDeposit: NEAR.parse('0.1') });
 
   // Save state for test runs, it is unique for each test
@@ -47,7 +47,7 @@ test("by default it return the two messages and their payments", async (t) => {
     { premium: true, sender: alice.accountId, text: "bye" },
   ];
 
-  const expected_payments = ["0", NEAR.parse("0.1").toString()];
+  const expected_payments = [NEAR.parse("0.09").toString(), NEAR.parse("0.1").toString()];
 
   t.deepEqual(msgs, expected_msgs);
   t.deepEqual(payments, expected_payments);
@@ -64,7 +64,7 @@ test("the migration removes payments and updates PostedMessages", async (t) => {
   const msgs = await guestBook.view("get_messages");
 
   const expected = [
-    { payment: 0, premium: false, sender: guestBook.accountId, text: "hello" },
+    { payment: 9e+22, premium: false, sender: guestBook.accountId, text: "hello" },
     { payment: 1e+23, premium: true, sender: alice.accountId, text: "bye" },
   ];
 
