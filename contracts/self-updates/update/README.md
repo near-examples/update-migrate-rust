@@ -28,7 +28,7 @@ Lets call `update_contract` passing the new code ([./src](./src/)) using the [`m
 ```bash
 # run from project-root/contracts
 NEW_CONTRACT_BYTES=`cat ./target/wasm32-unknown-unknown/release/self_update.wasm | base64`
-near call <dev-account> update_contract "$NEW_CONTRACT_BYTES" --base64 --accountId <manager-account>
+near call <dev-account> update_contract "$NEW_CONTRACT_BYTES" --base64 --accountId <manager-account> --gas 300000000000000
 ```
 <br />
 
