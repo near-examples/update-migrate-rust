@@ -1051,6 +1051,22 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "9c8132065adcfd6e02db789d9285a0deb2f3fcb04002865ab67d5fb103533898"
 
 [[package]]
+name = "self-base"
+version = "1.0.0"
+dependencies = [
+ "near-sdk",
+ "uint",
+]
+
+[[package]]
+name = "self-update"
+version = "1.0.0"
+dependencies = [
+ "near-sdk",
+ "uint",
+]
+
+[[package]]
 name = "semver"
 version = "1.0.14"
 source = "registry+https://github.com/rust-lang/crates.io-index"

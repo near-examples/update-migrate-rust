@@ -1,4 +1,4 @@
-# Guest Book Contract
+# Guest Book Contract - Versioned Messages
 
 The smart contract stores **versioned** messages. This simplifies further updates of the contract.
 

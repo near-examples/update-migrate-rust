@@ -13,6 +13,7 @@ pub struct OldPostedMessage {
 pub struct OldState {
     messages: Vector<OldPostedMessage>,
     payments: Vector<Balance>,
+    manager: AccountId,
 }
 
 #[near_bindgen]
@@ -40,6 +41,7 @@ impl GuestBook {
         // return the new state
         Self {
             messages: new_messages,
+            manager: old_state.manager,
         }
     }
 }

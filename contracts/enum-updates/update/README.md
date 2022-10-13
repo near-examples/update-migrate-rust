@@ -1,4 +1,4 @@
-# Guest Book Contract
+# Guest Book Contract - Versioned Messages Update
 
 This examples adds a new version to the **versioned** messages of the [enum-base](../base/) contracts.
 

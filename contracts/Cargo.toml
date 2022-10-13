@@ -12,4 +12,6 @@ members = [
     "basic-updates/update",
     "enum-updates/base",
     "enum-updates/update",
+    "self-updates/base",
+    "self-updates/update",
 ]
