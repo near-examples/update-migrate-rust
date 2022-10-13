@@ -55,10 +55,10 @@ cat ./neardev/dev-account # e.g. dev-X-Y
 Check the account's full-access key and remove it from the account, thus leaving it locked:
 
 ```bash
-cat ~/.near-credentials/testnet/<dev-account>.json
-# result: {"account_id": "<dev-account>", "public_key": "<key>"}
+near keys <dev-account>
+# result: [access_key: {"nonce": ..., "public_key": '<key>'}]
 
-near delete-key <dev-account> "<key>"
+near delete-key <dev-account> '<key>'
 ```
 
 <br />
