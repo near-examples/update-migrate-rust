@@ -20,15 +20,15 @@ impl GuestBook {
     #[private]
     #[init(ignore_state)]
     pub fn migrate() -> Self {
+        // retrieve the current state from the contract
         let old_state: OldState = env::state_read().expect("failed");
+
+        // iterate through the state migrating it to the new version
         let mut new_messages: Vector<PostedMessage> = Vector::new(b"p");
 
-        // iterate through the messages of the previous state
         for (idx, posted) in old_state.messages.iter().enumerate() {
-            // get the payment using the message index
             let payment = old_state.payments.get(idx as u64).unwrap_or(0);
 
-            // Create a PostedMessage with the new format and push it
             new_messages.push(&PostedMessage {
                 payment,
                 premium: posted.premium,
