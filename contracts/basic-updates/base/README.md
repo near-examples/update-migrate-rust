@@ -42,6 +42,7 @@ cat ./neardev/dev-account # e.g. dev-X-Y
 ```bash
 near call <dev-account> add_message '{"text": "a message"}' --amount 0.1 --accountId <account>
 ```
+<br />
 
 ## 3. Retrieve the Stored Messages & Payments
 `get_messages` and `get_payments` are read-only method (`view` method)
@@ -51,4 +52,7 @@ near view <dev-account> get_messages
 near view <dev-account> get_payments
 ```
 
+<br />
 
+## 4. Continue in the Update Folder
+Navigate to the [update](../update/) folder to continue

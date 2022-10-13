@@ -1,7 +1,8 @@
 # Guest Book Contract - Self Update
 
-The [Guest Book Contract](../../basic-updates/base/) featuring a `update_contract`
-that takes a smart contract directly from the input and deploys it on itself.
+A [Guest Book Contract](../../basic-updates/base/) that can self-update.
+
+This contract has a `update_contract` that takes as input a wasm file and deploys it on itself.
 
 ```rust
 pub fn update_contract(&self) -> Promise {
@@ -63,15 +64,22 @@ near delete-key <dev-account> '<key>'
 
 <br />
 
-## 2. Add a Message
+## 3. Add a Message
 ```bash
 near call <dev-account> add_message '{"text": "a message"}' --amount 0.1 --accountId <account>
 ```
 
-## 3. Retrieve the Stored Messages & Payments
+<br />
+
+## 4. Retrieve the Stored Messages & Payments
 `get_messages` and `get_payments` are read-only method (`view` method)
 
 ```bash
 near view <dev-account> get_messages
 near view <dev-account> get_payments
 ```
+
+<br />
+
+## 5. Continue in the Update Folder
+Navigate to the [update](../update/) folder to continue

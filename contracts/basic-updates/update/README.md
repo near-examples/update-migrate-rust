@@ -74,7 +74,7 @@ near view <dev-account> get_messages
 near call <dev-account> migrate {} --accountId <dev-account>
 ```
 
-### Deploying and Migrating
+#### Deploying and Migrating
 You can actually deploy the contract and migrate the state in one line:
 ```bash
 near deploy <dev-account> --wasmFile target/wasm32-unknown-unknown/release/update.wasm --initFunction migrate --initArgs {}

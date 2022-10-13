@@ -16,7 +16,7 @@ pub struct GuestBook {
 }
 ```
 
-## Asking the Contract to Update Itself
+## 1. Asking the Contract to Update Itself
 
 The [base contract](../base/) implements a `update_contract` method that only the `manager` can call. That method takes
 a compiled wasm as input and then:

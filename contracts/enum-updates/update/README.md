@@ -57,6 +57,8 @@ because the contract was already prepared to handle versioned messages!
 near call <dev-account> add_message '{"text": "another message"}' --amount 0.1 --accountId <account>
 ```
 
+<br />
+
 ## 3. Retrieve the Messages
 You will see that the old `V1` messages always have `payment: 0`, while the new ones keep track
 of the payment
