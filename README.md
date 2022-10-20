@@ -7,7 +7,7 @@
 Three examples on how to handle updates and [state migration](https://docs.near.org/develop/upgrade/migration):
 1. [State Migration](./contracts/basic-updates/): How to implement a `migrate` method to migrate state between contract updates.
 2. [State Versioning](./contracts/enum-updates/): How to use readily use versioning on a state, to simplify updating it later.
-3. [Self Update](./contracts/self-updates/): How to use readily use versioning on a state, to simplify updating it later.
+3. [Self Update](./contracts/self-updates/): How to implement a contract that can update itself.
 
 <br />
 
