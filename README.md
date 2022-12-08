@@ -2,7 +2,7 @@
 [![](https://img.shields.io/badge/⋈%20Examples-Intermediate-orange)](https://docs.near.org/tutorials/welcome)
 [![](https://img.shields.io/badge/Contract-rust-red)](https://docs.near.org/develop/contracts/anatomy)
 [![](https://img.shields.io/badge/Frontend-None-gray)](https://docs.near.org/develop/integrate/frontend)
-[![](https://img.shields.io/badge/Testing-passing-green)](https://docs.near.org/develop/integrate/frontend)
+[![](https://img.shields.io/github/workflow/status/near-examples/update-migrate-rust/Tests/main?color=green&label=Tests)](https://github.com/near-examples/update-migrate-rust/actions/workflows/tests.yml)
 
 Three examples on how to handle updates and [state migration](https://docs.near.org/develop/upgrade/migration):
 1. [State Migration](./contracts/basic-updates/): How to implement a `migrate` method to migrate state between contract updates.
