@@ -8,5 +8,4 @@ edition = "2021"
 crate-type = ["cdylib"]
 
 [dependencies]
-near-sdk = "4.0.0"
-uint = { version = "0.9.3", default-features = false }
+near-sdk = { version = "5.0.0", features = ["legacy"] }

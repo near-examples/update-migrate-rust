@@ -60,24 +60,55 @@ pub fn migrate() -> Self {
 
 # Upgrading Base Contract
 
-## 1. Deploy & Migrate State
+## 1. Build & Deploy & Migrate State
+
+_In this example we will be using [NEAR CLI](https://github.com/near/near-cli)
+to intract with the NEAR blockchain and the smart contract and [near-cli-rs](https://near.cli.rs)
+which provides more control over interactions and has interactive menus for subcommands selection_
+
+To build contract install [`cargo-near`](https://github.com/near/cargo-near) and run:
+
+```bash
+# from repo root
+cd contracts/basic-updates/update
+cargo near build
+```
+
 You can deploy the updated contract by running:
 
 ```bash
-# deploy the updated contract
-near deploy <dev-account> --wasmFile target/wasm32-unknown-unknown/release/update.wasm
+# `update-migrate-rust-basic-updates-base.testnet` was used as example of <target-account-id>
+# NEAR CLI
+near deploy <target-account-id> ../../target/near/update/update.wasm
+# near-cli-rs 
+near contract deploy <target-account-id> use-file ../../target/near/update/update.wasm without-init-call network-config testnet sign-with-keychain send
+```
 
-# run this command to see the "Cannot deserialize..." error
-near view <dev-account> get_messages
+Run this command to see the "Cannot deserialize..." error
+```bash
+# NEAR CLI
+near view <target-account-id> get_messages
+# near-cli-rs 
+near contract call-function as-read-only <target-account-id> get_messages json-args {} network-config testnet now
+```
 
-# Ask the contract to migrate the state
-near call <dev-account> migrate {} --accountId <dev-account>
+Ask the contract to migrate the state
+
+```bash
+# NEAR CLI
+near call <target-account-id> migrate {} --accountId <target-account-id>
+# near-cli-rs (may be useful to specify more gas for large state migrations)
+near contract call-function as-transaction <target-account-id> migrate json-args {} prepaid-gas '100.0 Tgas' attached-deposit '0 NEAR' sign-as <target-account-id> network-config testnet sign-with-keychain send
 ```
 
 #### Deploying and Migrating
 You can actually deploy the contract and migrate the state in one line:
+
 ```bash
-near deploy <dev-account> --wasmFile target/wasm32-unknown-unknown/release/update.wasm --initFunction migrate --initArgs {}
+# NEAR CLI
+near deploy <target-account-id> ../../target/near/update/update.wasm --initFunction migrate --initArgs {}
+# near-cli-rs (may be useful to specify more gas for large state migrations)
+near contract deploy <target-account-id> use-file ../../target/near/update/update.wasm with-init-call migrate json-args {} prepaid-gas '100.0 Tgas' attached-deposit '0 NEAR' network-config testnet sign-with-keychain send
 ```
 
 <br />
@@ -86,12 +117,14 @@ near deploy <dev-account> --wasmFile target/wasm32-unknown-unknown/release/updat
 `get_messages` will now return messages that include a `payment` field.
 
 ```bash
-near view <dev-account> get_messages
+# NEAR CLI
+near view <target-account-id> get_messages
 ```
 
 `get_payments` will raise an error since the method does not exist anymore.
 
 ```bash
+# NEAR CLI
 # raises an error since the method is gone
-near view <dev-account> get_payments
+near view <target-account-id> get_payments
 ```

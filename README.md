@@ -62,6 +62,7 @@ The example is composed by 2 contracts:
 
 ```rust
 #[derive(BorshSerialize, BorshDeserialize)]
+#[borsh(crate = "near_sdk::borsh")]
 pub enum VersionedPostedMessage {
   V1(PostedMessageV1),
   V2(PostedMessageV2),
