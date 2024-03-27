@@ -3,7 +3,7 @@ use crate::*;
 #[derive(NearSchema, BorshDeserialize, BorshSerialize, Serialize)]
 #[serde(crate = "near_sdk::serde")]
 #[borsh(crate = "near_sdk::borsh")]
-#[abi(json, borsh)]
+#[abi(json)]
 pub struct PostedMessageV1 {
     pub premium: bool,
     pub sender: AccountId,

@@ -9,7 +9,7 @@ const POINT_ONE: NearToken = NearToken::from_yoctonear(100_000_000_000_000_000_0
 #[derive(NearSchema, BorshDeserialize, BorshSerialize, Serialize)]
 #[serde(crate = "near_sdk::serde")]
 #[borsh(crate = "near_sdk::borsh")]
-#[abi(json, borsh)]
+#[abi(json)]
 pub struct PostedMessage {
     pub premium: bool,
     pub sender: AccountId,

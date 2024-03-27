@@ -12,7 +12,7 @@ pub struct PostedMessageV1 {
 #[derive(NearSchema, BorshDeserialize, BorshSerialize, Serialize)]
 #[serde(crate = "near_sdk::serde")]
 #[borsh(crate = "near_sdk::borsh")]
-#[abi(json, borsh)]
+#[abi(json)]
 pub struct PostedMessageV2 {
     pub payment: NearToken,
     pub premium: bool,
