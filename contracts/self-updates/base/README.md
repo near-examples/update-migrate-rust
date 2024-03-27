@@ -31,42 +31,63 @@ pub fn update_contract(&self) -> Promise {
 # Quickstart
 
 ## 1. Build and Deploy the Contract
-Compile, deploy, and initialize the contract setting the `manager`, this is the account that will be able
-to trigger the code update.
+
+_In this example we will be using [NEAR CLI](https://github.com/near/near-cli)
+to intract with the NEAR blockchain and the smart contract and [near-cli-rs](https://near.cli.rs)
+which provides more control over interactions and has interactive menus for subcommands selection_
+
+Install [`cargo-near`](https://github.com/near/cargo-near) and run:
 
 ```bash
-# build all examples, run from project-root/contracts
-./build.sh
-
-# delete the project-root/contracts/neardev folder if present
-# rm -rf ./neardev
-
-# deploy enum base contract
-near dev-deploy --wasmFile target/wasm32-unknown-unknown/release/self_base.wasm --initFunction init --initArgs '{"manager":"<manager-account>"}'
+# from repo root
+cd contracts/self-updates/base
+cargo near build
 ```
 
-Once finished, check the `neardev/dev-account` file to find in which address the contract was deployed:
+Build and deploy:
 
 ```bash
-cat ./neardev/dev-account # e.g. dev-X-Y
+# `update-migrate-rust-self-updates.testnet` was used as example of <target-account-id>
+# `update-migrate-rust-self-updates-manager.testnet` was used as example of <manager-account-id>
+cargo near deploy <target-account-id> with-init-call init json-args '{"manager":"<manager-account-id>"}' prepaid-gas '100.0 Tgas' attached-deposit '0 NEAR' network-config testnet sign-with-keychain send
 ```
+
 <br />
 
 ## 2. Lock the Account
-Check the account's full-access key and remove it from the account, thus leaving it locked:
+
+Check the account's full-access key:
 
 ```bash
-near keys <dev-account>
-# result: [access_key: {"nonce": ..., "public_key": '<key>'}]
+# NEAR CLI
+near keys <target-account-id>
+# result: [{access_key: {"nonce": ..., permission: 'FullAccess'}, "public_key": '<key>'}]
 
-near delete-key <dev-account> '<key>'
+# near-cli-rs 
+near account list-keys <target-account-id> network-config testnet now
+...
+```
+
+Remove the only full-access key, present in the output of the above command, from the <target-account-id>, thus leaving it locked:
+
+```bash
+# `ed25519:CE3AtAeHK3VKFPofhb9HLRoDEF2zmW5x9oWCoQU5a5FF` was used as example of <key>
+# NEAR CLI
+near delete-key <target-account-id> '<key>'
+
+# near-cli-rs 
+near account delete-keys <target-account-id> public-keys <key> network-config testnet sign-with-keychain send
 ```
 
 <br />
 
 ## 3. Add a Message
+
 ```bash
-near call <dev-account> add_message '{"text": "a message"}' --amount 0.1 --accountId <account>
+# NEAR CLI
+near call <target-account-id> add_message '{"text": "a message"}' --amount 0.1 --accountId <account>
+# near-cli-rs 
+near contract call-function as-transaction <target-account-id> add_message json-args '{"text": "a message"}' prepaid-gas '100.0 Tgas' attached-deposit '0.1 NEAR' sign-as <account> network-config testnet sign-with-keychain send
 ```
 
 <br />
@@ -75,8 +96,17 @@ near call <dev-account> add_message '{"text": "a message"}' --amount 0.1 --accou
 `get_messages` and `get_payments` are read-only method (`view` method)
 
 ```bash
-near view <dev-account> get_messages
-near view <dev-account> get_payments
+# NEAR CLI
+near view <target-account-id> get_messages
+# near-cli-rs 
+near contract call-function as-read-only <target-account-id> get_messages json-args {} network-config testnet now
+```
+  
+```bash
+# NEAR CLI
+near view <target-account-id> get_payments
+# near-cli-rs 
+near contract call-function as-read-only <target-account-id> get_payments json-args {} network-config testnet now
 ```
 
 <br />

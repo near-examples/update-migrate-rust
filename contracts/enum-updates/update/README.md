@@ -86,6 +86,4 @@ of the payment
 ```bash
 # NEAR CLI
 near view <target-account-id> get_messages
-# near-cli-rs 
-near contract call-function as-read-only <target-account-id> get_messages json-args {} network-config testnet now
 ```

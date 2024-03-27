@@ -3,7 +3,7 @@ use near_sdk::{Promise, Gas};
 use crate::*;
 
 const NO_ARGS: Vec<u8> = vec![];
-const CALL_GAS: Gas = Gas(200_000_000_000_000); // 200 TGAS
+const CALL_GAS: Gas = Gas::from_tgas(200); // 200 TGAS
 
 #[near_bindgen]
 impl GuestBook{
@@ -21,7 +21,7 @@ impl GuestBook{
         .function_call(
             "migrate".to_string(),
             NO_ARGS,
-            0,
+            NearToken::from_near(0),
             CALL_GAS
         )
         .as_return()
