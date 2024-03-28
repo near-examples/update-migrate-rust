@@ -1,8 +1,8 @@
 use crate::*;
 
-#[near_bindgen]
 #[derive(BorshDeserialize, BorshSerialize, Serialize)]
 #[serde(crate = "near_sdk::serde")]
+#[borsh(crate = "near_sdk::borsh")]
 pub struct OldPostedMessage {
     pub premium: bool,
     pub sender: AccountId,
@@ -10,9 +10,10 @@ pub struct OldPostedMessage {
 }
 
 #[derive(BorshDeserialize, BorshSerialize)]
+#[borsh(crate = "near_sdk::borsh")]
 pub struct OldState {
     messages: Vector<OldPostedMessage>,
-    payments: Vector<Balance>,
+    payments: Vector<NearToken>,
     manager: AccountId,
 }
 
@@ -27,7 +28,10 @@ impl GuestBook {
         // iterate through the messages of the previous state
         for (idx, posted) in old_state.messages.iter().enumerate() {
             // get the payment using the message index
-            let payment = old_state.payments.get(idx as u64).unwrap_or(0);
+            let payment = old_state
+                .payments
+                .get(idx as u64)
+                .unwrap_or(NearToken::from_near(0));
 
             // Create a PostedMessage with the new format and push it
             new_messages.push(&PostedMessage {

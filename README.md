@@ -125,6 +125,15 @@ pub fn update_contract(&self) -> Promise {
 
 Clone this repository locally or [**open it in gitpod**](https://gitpod.io/#/github.com/near-examples/multiple-cross-contract-calls). Then follow these steps:
 
+### 0. Accounts for deploying contracts from these examples can be created by:  
+
+```bash
+# NEAR CLI
+near create-account <target-account-id> --useFaucet
+# near-cli-rs 
+near account create-account sponsor-by-faucet-service <target-account-id> autogenerate-new-keypair save-to-keychain network-config testnet create
+```
+
 ### 1. Install Dependencies
 ```bash
 npm install

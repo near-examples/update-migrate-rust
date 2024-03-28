@@ -5,43 +5,61 @@ in the `PostedMessage` structure.
 
 ```rust
 pub struct PostedMessage {
-  pub payment: u128, 
-  pub premium: bool, 
-  pub sender: AccountId,
-  pub text: String
+    pub payment: NearToken,
+    pub premium: bool,
+    pub sender: AccountId,
+    pub text: String,
 }
 
 pub struct GuestBook {
-  messages: Vector<PostedMessage>,
+    messages: Vector<PostedMessage>,
+    manager: AccountId,
 }
 ```
 
-## 1. Asking the Contract to Update Itself
+## 1. Build
+
+Install [`cargo-near`](https://github.com/near/cargo-near) and run:
+
+```bash
+# from repo root
+cd contracts/self-updates/update
+cargo near build
+```
+
+## 2. Asking the Contract to Update Itself
+
+_In this example we will be using [NEAR CLI](https://github.com/near/near-cli)
+to intract with the NEAR blockchain and the smart contract and [near-cli-rs](https://near.cli.rs)
+which provides more control over interactions and has interactive menus for subcommands selection_
 
 The [base contract](../base/) implements a `update_contract` method that only the `manager` can call. That method takes
 a compiled wasm as input and then:
-1. Deploys in on itself.
+1. Deploys it on itself.
 2. Calls the `migrate` method on itself.
 
 Lets call `update_contract` passing the new code ([./src](./src/)) using the [`manager-account`](../base/README.md#1-build-and-deploy-the-contract).
 
 ```bash
-# run from project-root/contracts
-NEW_CONTRACT_BYTES=`cat ./target/wasm32-unknown-unknown/release/self_update.wasm | base64`
-near call <dev-account> update_contract "$NEW_CONTRACT_BYTES" --base64 --accountId <manager-account> --gas 300000000000000
+# `update-migrate-rust-self-updates.testnet` was used as example of <target-account-id>
+# `update-migrate-rust-self-updates-manager.testnet` was used as example of <manager-account-id>
+# near-cli-rs 
+near contract call-function as-transaction <target-account-id> update_contract file-args ../../target/near/self_update/self_update.wasm prepaid-gas '300.0 Tgas' attached-deposit '0 NEAR' sign-as <manager-account-id> network-config testnet sign-with-keychain send
 ```
 <br />
 
-## 2. Retrieve the Stored Messages
+## 3. Retrieve the Stored Messages
 `get_messages` will now return messages that include a `payment` field.
 
 ```bash
-near view <dev-account> get_messages
+# NEAR CLI
+near view <target-account-id> get_messages
 ```
 
 `get_payments` will raise an error since the method does not exist anymore.
 
 ```bash
 # raises an error since the method is gone
-near view <dev-account> get_payments
+# NEAR CLI
+near view <target-account-id> get_payments
 ```
