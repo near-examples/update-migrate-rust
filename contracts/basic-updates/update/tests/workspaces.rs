@@ -64,7 +64,7 @@ async fn base_contract() -> Common {
 
 #[rstest]
 #[tokio::test]
-async fn test_base_contract_returns(
+async fn test_basic_updates_base_contract_returns(
     #[future] base_contract: Common,
 ) -> Result<(), Box<dyn std::error::Error>> {
     let base_contract = base_contract.await;
@@ -118,7 +118,9 @@ async fn test_base_contract_returns(
 
 #[rstest]
 #[tokio::test]
-async fn test_migration(#[future] base_contract: Common) -> Result<(), Box<dyn std::error::Error>> {
+async fn test_basic_updates_migration(
+    #[future] base_contract: Common,
+) -> Result<(), Box<dyn std::error::Error>> {
     let base_contract = base_contract.await;
 
     fs::create_dir_all("../../target/near/update").unwrap();

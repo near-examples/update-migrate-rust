@@ -1062,6 +1062,9 @@ name = "enums-update"
 version = "1.0.0"
 dependencies = [
  "near-sdk",
+ "near-workspaces",
+ "serde_json",
+ "tokio",
 ]
 
 [[package]]
