@@ -64,8 +64,7 @@ The example is composed by 2 contracts:
 2. Update: An update that adds a new version of `PostedMessages` (`PostedMessagesV2`).
 
 ```rust
-#[derive(BorshSerialize, BorshDeserialize)]
-#[borsh(crate = "near_sdk::borsh")]
+#[near(serializers=[borsh])]
 pub enum VersionedPostedMessage {
     V1(PostedMessageV1),
     V2(PostedMessageV2),

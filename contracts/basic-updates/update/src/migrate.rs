@@ -1,22 +1,19 @@
 use crate::*;
 
-#[derive(BorshDeserialize, BorshSerialize, Serialize)]
-#[serde(crate = "near_sdk::serde")]
-#[borsh(crate = "near_sdk::borsh")]
+#[near(serializers=[borsh])]
 pub struct OldPostedMessage {
     pub premium: bool,
     pub sender: AccountId,
     pub text: String,
 }
 
-#[derive(BorshDeserialize, BorshSerialize)]
-#[borsh(crate = "near_sdk::borsh")]
+#[near(serializers=[borsh])]
 pub struct OldState {
     messages: Vector<OldPostedMessage>,
     payments: Vector<NearToken>,
 }
 
-#[near_bindgen]
+#[near]
 impl GuestBook {
     #[private]
     #[init(ignore_state)]

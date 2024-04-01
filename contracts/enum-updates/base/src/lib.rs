@@ -1,17 +1,16 @@
-use near_sdk::borsh::{BorshDeserialize, BorshSerialize};
+use near_sdk::near;
+
 use near_sdk::collections::Vector;
 use near_sdk::json_types::U128;
-use near_sdk::serde::Serialize;
-use near_sdk::{env, near_bindgen, AccountId, NearSchema, NearToken};
+
+use near_sdk::{env, AccountId, NearToken};
 
 use versioned_msg::{PostedMessageV1, VersionedPostedMessage};
 mod versioned_msg;
 
 const POINT_ONE: NearToken = NearToken::from_yoctonear(100_000_000_000_000_000_000_000);
 
-#[near_bindgen]
-#[derive(BorshDeserialize, BorshSerialize)]
-#[borsh(crate = "near_sdk::borsh")]
+#[near(contract_state)]
 pub struct GuestBook {
     messages: Vector<VersionedPostedMessage>,
 }
@@ -24,7 +23,7 @@ impl Default for GuestBook {
     }
 }
 
-#[near_bindgen]
+#[near]
 impl GuestBook {
     #[payable]
     pub fn add_message(&mut self, text: String) {

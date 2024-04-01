@@ -5,7 +5,7 @@ use crate::*;
 const NO_ARGS: Vec<u8> = vec![];
 const CALL_GAS: Gas = Gas::from_tgas(200); // 200 TGAS
 
-#[near_bindgen]
+#[near]
 impl GuestBook {
     pub fn update_contract(&self) -> Promise {
         // Check the caller is authorized to update the code

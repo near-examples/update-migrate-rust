@@ -1,17 +1,13 @@
 use crate::*;
 
-#[derive(NearSchema, BorshDeserialize, BorshSerialize, Serialize)]
-#[serde(crate = "near_sdk::serde")]
-#[borsh(crate = "near_sdk::borsh")]
-#[abi(json)]
+#[near(serializers=[borsh,json])]
 pub struct PostedMessageV1 {
     pub premium: bool,
     pub sender: AccountId,
     pub text: String,
 }
 
-#[derive(BorshSerialize, BorshDeserialize)]
-#[borsh(crate = "near_sdk::borsh")]
+#[near(serializers=[borsh])]
 pub enum VersionedPostedMessage {
     V1(PostedMessageV1),
 }
