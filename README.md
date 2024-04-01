@@ -16,34 +16,37 @@ The examples at [./contracts/basic-updates](./contracts/basic-updates) show how 
 between contract updates.
 
 It is composed by 2 contracts:
-1. Base: A Guest Book were people can write messages.
+1. Base: A Guest Book where people can write messages.
 2. Update: An update in which we remove a parameter and change the internal structure.
 
 ```rust
 #[private]
 #[init(ignore_state)]
 pub fn migrate() -> Self {
-  let old_state: OldState = env::state_read().expect("failed");
-  let mut new_messages: Vector<PostedMessage> = Vector::new(b"p");
+    // retrieve the current state from the contract
+    let old_state: OldState = env::state_read().expect("failed");
 
-  // iterate through the messages of the previous state
-  for (idx, posted) in old_state.messages.iter().enumerate() {
-    // get the payment using the message index
-    let payment = old_state.payments.get(idx as u64).unwrap_or(0);
+    // iterate through the state migrating it to the new version
+    let mut new_messages: Vector<PostedMessage> = Vector::new(b"p");
 
-    // Create a PostedMessage with the new format and push it
-    new_messages.push(&PostedMessage {
-      payment,
-      premium: posted.premium,
-      sender: posted.sender,
-      text: posted.text,
-    })
-  }
+    for (idx, posted) in old_state.messages.iter().enumerate() {
+        let payment = old_state
+            .payments
+            .get(idx as u64)
+            .unwrap_or(NearToken::from_near(0));
 
-  // return the new state
-  Self {
-    messages: new_messages,
-  }
+        new_messages.push(&PostedMessage {
+            payment,
+            premium: posted.premium,
+            sender: posted.sender,
+            text: posted.text,
+        })
+    }
+
+    // return the new state
+    Self {
+        messages: new_messages,
+    }
 }
 ```
 
@@ -64,22 +67,22 @@ The example is composed by 2 contracts:
 #[derive(BorshSerialize, BorshDeserialize)]
 #[borsh(crate = "near_sdk::borsh")]
 pub enum VersionedPostedMessage {
-  V1(PostedMessageV1),
-  V2(PostedMessageV2),
+    V1(PostedMessageV1),
+    V2(PostedMessageV2),
 }
 
 impl From<VersionedPostedMessage> for PostedMessageV2 {
-  fn from(message: VersionedPostedMessage) -> Self {
-    match message {
-      VersionedPostedMessage::V2(posted) => posted,
-      VersionedPostedMessage::V1(posted) => PostedMessageV2 {
-        payment: if posted.premium { POINT_ONE } else { 0 },
-        premium: posted.premium,
-        sender: posted.sender,
-        text: posted.text,
-      },
+    fn from(message: VersionedPostedMessage) -> Self {
+        match message {
+            VersionedPostedMessage::V2(posted) => posted,
+            VersionedPostedMessage::V1(posted) => PostedMessageV2 {
+                payment: NearToken::from_near(0),
+                premium: posted.premium,
+                sender: posted.sender,
+                text: posted.text,
+            },
+        }
     }
-  }
 }
 ```
 
@@ -95,26 +98,26 @@ It is composed by 2 contracts:
 
 ```rust
 pub fn update_contract(&self) -> Promise {
-  // Check the caller is authorized to update the code
-  assert!(
-    env::predecessor_account_id() == self.manager,
-    "Only the manager can update the code"
-  );
+    // Check the caller is authorized to update the code
+    assert!(
+        env::predecessor_account_id() == self.manager,
+        "Only the manager can update the code"
+    );
 
-  // Receive the code directly from the input to avoid the
-  // GAS overhead of deserializing parameters
-  let code = env::input().expect("Error: No input").to_vec();
+    // Receive the code directly from the input to avoid the
+    // GAS overhead of deserializing parameters
+    let code = env::input().expect("Error: No input").to_vec();
 
-  // Deploy the contract on self
-  Promise::new(env::current_account_id())
-  .deploy_contract(code)
-  .function_call(
-    "migrate".to_string(),
-    NO_ARGS,
-    0,
-    CALL_GAS
-  )
-  .as_return()
+    // Deploy the contract on self
+    Promise::new(env::current_account_id())
+        .deploy_contract(code)
+        .function_call(
+            "migrate".to_string(),
+            NO_ARGS,
+            NearToken::from_near(0),
+            CALL_GAS,
+        )
+        .as_return()
 }
 ```
 
@@ -123,9 +126,35 @@ pub fn update_contract(&self) -> Promise {
 
 # Quickstart
 
-Clone this repository locally or [**open it in gitpod**](https://gitpod.io/#/github.com/near-examples/multiple-cross-contract-calls). Then follow these steps:
+Clone this repository locally. Then follow these steps:
 
-### 0. Accounts for deploying contracts from these examples can be created by:  
+
+### 0. Test the Contract
+Deploy your contract in a sandbox and simulate interactions from users.
+
+```bash
+cd contracts
+cargo test --workspace
+```
+
+### 1. Examples' cli-s versions
+
+Commands in each contract's `README` are valid for following versions of programs.
+
+```bash
+# NEAR CLI
+❯ near --version
+4.0.10
+
+# near-cli-rs 
+❯ near --version
+near-cli-rs 0.8.1
+
+❯ cargo near --version
+cargo-near-near 0.6.1
+```
+
+### 2. Accounts for deploying contracts from these examples can be created by:  
 
 ```bash
 # NEAR CLI
@@ -134,20 +163,9 @@ near create-account <target-account-id> --useFaucet
 near account create-account sponsor-by-faucet-service <target-account-id> autogenerate-new-keypair save-to-keychain network-config testnet create
 ```
 
-### 1. Install Dependencies
-```bash
-npm install
-```
-
-### 2. Test the Contract
-Deploy your contract in a sandbox and simulate interactions from users.
-
-```bash
-npm test
-```
 
 ---
 
 # Learn More
-1. Learn more on each contract's [README](./contract/README.md).
+1. Learn more on each contract's `README`.
 2. Check [**our documentation**](https://docs.near.org/develop/welcome).
