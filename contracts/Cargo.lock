@@ -3253,6 +3253,10 @@ name = "self-update"
 version = "1.0.0"
 dependencies = [
  "near-sdk",
+ "near-workspaces",
+ "rstest",
+ "serde_json",
+ "tokio",
 ]
 
 [[package]]

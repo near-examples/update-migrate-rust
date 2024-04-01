@@ -1,10 +1,12 @@
-use rstest::{fixture, rstest};
 use std::fs;
 
-use near_workspaces::{types::NearToken, Account, Contract};
+use near_sdk::json_types::U128;
+use near_sdk::{AccountId, Gas};
+use near_workspaces::types::NearToken;
+use near_workspaces::Account;
+use near_workspaces::Contract;
+use rstest::{fixture, rstest};
 use serde_json::json;
-
-use near_sdk::{json_types::U128, AccountId};
 
 const ONE_TENTH_NEAR: NearToken = NearToken::from_millinear(100);
 const NINE_HUNDREDTH_NEAR: NearToken = NearToken::from_millinear(90);
@@ -12,6 +14,7 @@ const NINE_HUNDREDTH_NEAR: NearToken = NearToken::from_millinear(90);
 struct Common {
     contract: Contract,
     alice: Account,
+    bob: Account,
     guest_book: Account,
 }
 
@@ -19,9 +22,10 @@ struct Common {
 async fn base_contract() -> Common {
     let sandbox = near_workspaces::sandbox().await.unwrap();
 
-    fs::create_dir_all("../../target/near/base").unwrap();
+    fs::create_dir_all("../../target/near/self_base").unwrap();
     let contract_wasm = near_workspaces::compile_project("../base").await.unwrap();
 
+    let alice = sandbox.dev_create_account().await.unwrap();
     let guest_book_account = sandbox.dev_create_account().await.unwrap();
 
     let contract = guest_book_account
@@ -30,9 +34,19 @@ async fn base_contract() -> Common {
         .unwrap()
         .into_result()
         .unwrap();
-    let alice = sandbox.dev_create_account().await.unwrap();
 
-    let guest_book_message_outcome = guest_book_account
+    let guest_book_init_outcome = guest_book_account
+        .call(contract.id(), "init")
+        .args_json(json!({"manager": alice.id().to_string() }))
+        .transact()
+        .await
+        .unwrap();
+
+    assert!(guest_book_init_outcome.is_success());
+
+    let bob = sandbox.dev_create_account().await.unwrap();
+
+    let bob_first_message_outcome = bob
         .call(contract.id(), "add_message")
         .args_json(json!({"text": "hello"}))
         .deposit(NINE_HUNDREDTH_NEAR)
@@ -40,7 +54,7 @@ async fn base_contract() -> Common {
         .await
         .unwrap();
 
-    assert!(guest_book_message_outcome.is_success());
+    assert!(bob_first_message_outcome.is_success());
 
     let alice_first_message_outcome = alice
         .call(contract.id(), "add_message")
@@ -55,13 +69,14 @@ async fn base_contract() -> Common {
     Common {
         contract,
         alice,
+        bob,
         guest_book: guest_book_account,
     }
 }
 
 #[rstest]
 #[tokio::test]
-async fn test_basic_updates_base_contract_returns(
+async fn test_self_updates_base_contract_returns(
     #[future] base_contract: Common,
 ) -> Result<(), Box<dyn std::error::Error>> {
     let base_contract = base_contract.await;
@@ -85,7 +100,7 @@ async fn test_basic_updates_base_contract_returns(
         vec![
             PostedMessage {
                 premium: false,
-                sender: base_contract.guest_book.id().clone(),
+                sender: base_contract.bob.id().clone(),
                 text: "hello".to_string(),
             },
             PostedMessage {
@@ -95,6 +110,7 @@ async fn test_basic_updates_base_contract_returns(
             },
         ]
     );
+
     let payments_vec: Vec<U128> = base_contract
         .contract
         .view("get_payments")
@@ -115,31 +131,26 @@ async fn test_basic_updates_base_contract_returns(
 
 #[rstest]
 #[tokio::test]
-async fn test_basic_updates_migration(
+async fn test_self_updates_update_by_manager(
     #[future] base_contract: Common,
 ) -> Result<(), Box<dyn std::error::Error>> {
     let base_contract = base_contract.await;
 
-    fs::create_dir_all("../../target/near/update").unwrap();
+    fs::create_dir_all("../../target/near/self_update").unwrap();
     let updated_contract_wasm = near_workspaces::compile_project("./").await.unwrap();
 
-    let migrated_contract = base_contract
-        .guest_book
-        .deploy(&updated_contract_wasm)
-        .await
-        .unwrap()
-        .into_result()
-        .unwrap();
-
-    let migrate_call_outcome = base_contract
-        .guest_book
-        .call(migrated_contract.id(), "migrate")
-        .args_json(json!({}))
+    let manager_update_call_outcome = base_contract
+        .alice
+        .call(base_contract.guest_book.id(), "update_contract")
+        .args(updated_contract_wasm)
+        .gas(Gas::from_tgas(300))
         .transact()
         .await
         .unwrap();
 
-    assert!(migrate_call_outcome.is_success());
+    assert!(manager_update_call_outcome.is_success());
+
+    let contract = base_contract.contract;
 
     #[derive(near_sdk::serde::Deserialize, Debug, PartialEq, Eq)]
     #[serde(crate = "near_sdk::serde")]
@@ -149,7 +160,7 @@ async fn test_basic_updates_migration(
         pub sender: AccountId,
         pub text: String,
     }
-    let messages_vec: Vec<PostedMessage> = migrated_contract
+    let messages_vec: Vec<PostedMessage> = contract
         .view("get_messages")
         .args_json(json!({}))
         .await?
@@ -160,7 +171,7 @@ async fn test_basic_updates_migration(
             PostedMessage {
                 payment: NINE_HUNDREDTH_NEAR,
                 premium: false,
-                sender: base_contract.guest_book.id().clone(),
+                sender: base_contract.bob.id().clone(),
                 text: "hello".to_string(),
             },
             PostedMessage {
@@ -171,10 +182,7 @@ async fn test_basic_updates_migration(
             },
         ]
     );
-    let get_payments_result = migrated_contract
-        .view("get_payments")
-        .args_json(json!({}))
-        .await;
+    let get_payments_result = contract.view("get_payments").args_json(json!({})).await;
 
     assert!(get_payments_result.is_err());
     Ok(())
