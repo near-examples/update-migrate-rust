@@ -126,7 +126,12 @@ pub fn update_contract(&self) -> Promise {
 
 # Quickstart
 
-Clone this repository locally. Then follow these steps:
+Clone this repository locally or open it in a codespace (see just below). 
+
+![create a codespace](./create_codespace.png)
+
+
+Then follow these steps:
 
 
 ### 0. Test the Contract
@@ -154,6 +159,8 @@ near-cli-rs 0.8.1
 cargo-near-near 0.6.1
 ```
 
+`NOTE`: default devcontainer for Codespaces contains only `near-cli-rs` and `cargo-near` commands. 
+
 ### 2. Accounts for deploying contracts from these examples can be created by:  
 
 ```bash
@@ -162,6 +169,8 @@ near create-account <target-account-id> --useFaucet
 # near-cli-rs 
 near account create-account sponsor-by-faucet-service <target-account-id> autogenerate-new-keypair save-to-keychain network-config testnet create
 ```
+
+`NOTE`: default devcontainer for Codespaces only supports `save-to-legacy-keychain` option instead of `save-to-keychain` of `near-cli-rs`. 
 
 
 ---
