@@ -40,7 +40,7 @@ Install [`cargo-near`](https://github.com/near/cargo-near) and run:
 
 ```bash
 # from repo root
-cd contracts/self-updates/base
+cd self-updates/base
 cargo near build
 ```
 

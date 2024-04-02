@@ -50,7 +50,7 @@ To build contract install [`cargo-near`](https://github.com/near/cargo-near) and
 
 ```bash
 # from repo root
-cd contracts/enum-updates/update
+cd enum-updates/update
 cargo near build
 ```
 

@@ -5,14 +5,14 @@
 [![](https://img.shields.io/github/workflow/status/near-examples/update-migrate-rust/Tests/main?color=green&label=Tests)](https://github.com/near-examples/update-migrate-rust/actions/workflows/tests.yml)
 
 Three examples on how to handle updates and [state migration](https://docs.near.org/develop/upgrade/migration):
-1. [State Migration](./contracts/basic-updates/): How to implement a `migrate` method to migrate state between contract updates.
-2. [State Versioning](./contracts/enum-updates/): How to use readily use versioning on a state, to simplify updating it later.
-3. [Self Update](./contracts/self-updates/): How to implement a contract that can update itself.
+1. [State Migration](./basic-updates/): How to implement a `migrate` method to migrate state between contract updates.
+2. [State Versioning](./enum-updates/): How to use readily use versioning on a state, to simplify updating it later.
+3. [Self Update](./self-updates/): How to implement a contract that can update itself.
 
 <br />
 
-## 1. [State Migration](./contracts/basic-updates/)
-The examples at [./contracts/basic-updates](./contracts/basic-updates) show how to handle state-breaking changes
+## 1. [State Migration](./basic-updates/)
+The examples at [./basic-updates](./basic-updates) show how to handle state-breaking changes
 between contract updates.
 
 It is composed by 2 contracts:
@@ -52,8 +52,8 @@ pub fn migrate() -> Self {
 
 <br />
 
-## 2. [State Versioning](./contracts/enum-updates/)
-The example at [./contracts/enum-updates/](./contracts/enum-updates/) shows how to use
+## 2. [State Versioning](./enum-updates/)
+The example at [./enum-updates/](./enum-updates/) shows how to use
 [Enums](https://doc.rust-lang.org/book/ch06-01-defining-an-enum.html) to implement versioning.
 
 Versioning simplifies updating the contract since you only need to add a new new version of the structure.
@@ -87,8 +87,8 @@ impl From<VersionedPostedMessage> for PostedMessageV2 {
 
 <br />
 
-## 3. [Self Update](./contracts/self-updates/)
-The examples at [./contracts/self-updates](./contracts/self-updates) shows how to implement a contract
+## 3. [Self Update](./self-updates/)
+The examples at [./self-updates](./self-updates) shows how to implement a contract
 that can update itself.
 
 It is composed by 2 contracts:
@@ -137,7 +137,6 @@ Then follow these steps:
 Deploy your contract in a sandbox and simulate interactions from users.
 
 ```bash
-cd contracts
 cargo test --workspace
 ```
 

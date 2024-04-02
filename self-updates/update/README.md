@@ -23,7 +23,7 @@ Install [`cargo-near`](https://github.com/near/cargo-near) and run:
 
 ```bash
 # from repo root
-cd contracts/self-updates/update
+cd self-updates/update
 cargo near build
 ```
 
