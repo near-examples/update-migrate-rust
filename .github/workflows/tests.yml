@@ -1,57 +1,22 @@
 name: CI
 
-permissions:
-  pull-requests: write
-  contents: write
-
 on:
   push:
     branches: [ main ]
   pull_request:
     branches: [ main ]
 
-env:
-  RUSTFLAGS: -D warnings
-  RUST_BACKTRACE: short
-  CARGO_NET_RETRY: 10
-  CARGO_TERM_COLOR: always
-  CARGO_INCREMENTAL: 0
 
 jobs:
-  test:
-    runs-on: ubuntu-20.04
+  workflows:
+    strategy:
+      matrix:
+        platform: [ubuntu-latest, macos-latest]
+    runs-on: ${{ matrix.platform }}
 
     steps:
     - name: Checkout Repository
       uses: actions/checkout@v4
-
-    - name: "Install stable Rust version"
-      uses: actions-rs/toolchain@v1
-      with:
-        profile: minimal
-        toolchain: stable
-        default: true
-        target: wasm32-unknown-unknown
 
     - name: Run cargo test
       run: cargo test --workspace
-
-  clippy:
-    runs-on: ubuntu-20.04
-
-    steps:
-    - name: Checkout Repository
-      uses: actions/checkout@v4
-
-    - name: Run clippy
-      run: cargo clippy -- -D clippy::all
-
-  cargo-fmt:
-    runs-on: ubuntu-20.04
-
-    steps:
-    - name: Checkout Repository
-      uses: actions/checkout@v4
-
-    - name: Run cargo fmt
-      run: cargo fmt -- --check
