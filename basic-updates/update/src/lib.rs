@@ -1,13 +1,13 @@
 use near_sdk::near;
 
 use near_sdk::collections::Vector;
-use near_sdk::json_types::U128;
+use near_sdk::json_types::{U64, U128};
 
 use near_sdk::{env, AccountId, NearToken};
 
 mod migrate;
 
-const POINT_ONE: NearToken = NearToken::from_yoctonear(100_000_000_000_000_000_000_000);
+const POINT_ONE: NearToken = NearToken::from_millinear(100);
 
 #[near(serializers=[json, borsh])]
 pub struct PostedMessage {
@@ -46,13 +46,13 @@ impl GuestBook {
         self.messages.push(&message);
     }
 
-    pub fn get_messages(&self, from_index: Option<U128>, limit: Option<u64>) -> Vec<PostedMessage> {
+    pub fn get_messages(&self, from_index: Option<U128>, limit: Option<U64>) -> Vec<PostedMessage> {
         let from = u128::from(from_index.unwrap_or(U128(0)));
 
         self.messages
             .iter()
             .skip(from as usize)
-            .take(limit.unwrap_or(10) as usize)
+            .take(u64::from(limit.unwrap_or(U64::from(10))) as usize)
             .collect()
     }
 }

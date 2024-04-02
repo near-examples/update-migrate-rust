@@ -8,6 +8,7 @@ use near_workspaces::Contract;
 use rstest::{fixture, rstest};
 use serde_json::json;
 
+const FIVE_NEAR: NearToken = NearToken::from_near(5);
 const ONE_TENTH_NEAR: NearToken = NearToken::from_millinear(100);
 const NINE_HUNDREDTH_NEAR: NearToken = NearToken::from_millinear(90);
 
@@ -25,8 +26,9 @@ async fn base_contract() -> Common {
     fs::create_dir_all("../../target/near/self_base").unwrap();
     let contract_wasm = near_workspaces::compile_project("../base").await.unwrap();
 
-    let alice = sandbox.dev_create_account().await.unwrap();
-    let guest_book_account = sandbox.dev_create_account().await.unwrap();
+    let root = sandbox.root_account().unwrap();
+    let alice = root.create_subaccount("alice").initial_balance(FIVE_NEAR).transact().await.unwrap().unwrap();
+    let guest_book_account = root.create_subaccount("gbook").initial_balance(FIVE_NEAR).transact().await.unwrap().unwrap();
 
     let contract = guest_book_account
         .deploy(&contract_wasm)
@@ -44,7 +46,7 @@ async fn base_contract() -> Common {
 
     assert!(guest_book_init_outcome.is_success());
 
-    let bob = sandbox.dev_create_account().await.unwrap();
+    let bob = root.create_subaccount("bob").initial_balance(FIVE_NEAR).transact().await.unwrap().unwrap();
 
     let bob_first_message_outcome = bob
         .call(contract.id(), "add_message")

@@ -18,5 +18,13 @@ jobs:
     - name: Checkout Repository
       uses: actions/checkout@v4
 
+    - name: "Install stable Rust version"
+      uses: actions-rs/toolchain@v1
+      with:
+        profile: minimal
+        toolchain: stable
+        default: true
+        target: wasm32-unknown-unknown
+
     - name: Run cargo test
       run: cargo test --workspace

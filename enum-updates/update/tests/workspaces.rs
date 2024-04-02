@@ -4,6 +4,7 @@ use std::fs;
 
 use near_sdk::AccountId;
 
+const FIVE_NEAR: NearToken = NearToken::from_near(5);
 const ONE_NEAR: NearToken = NearToken::from_near(1);
 const NINE_HUNDREDTH_NEAR: NearToken = NearToken::from_millinear(90);
 
@@ -14,7 +15,8 @@ async fn test_enum_updates_migration() -> Result<(), Box<dyn std::error::Error>>
     fs::create_dir_all("../../target/near/enums_base").unwrap();
     let base_contract_wasm = near_workspaces::compile_project("../base").await.unwrap();
 
-    let guest_book_account = sandbox.dev_create_account().await.unwrap();
+    let root = sandbox.root_account().unwrap();
+    let guest_book_account = root.create_subaccount("gbook").initial_balance(FIVE_NEAR).transact().await.unwrap().unwrap();
 
     let contract = guest_book_account
         .deploy(&base_contract_wasm)
@@ -23,7 +25,7 @@ async fn test_enum_updates_migration() -> Result<(), Box<dyn std::error::Error>>
         .into_result()
         .unwrap();
 
-    let alice = sandbox.dev_create_account().await.unwrap();
+    let alice = root.create_subaccount("alice").initial_balance(FIVE_NEAR).transact().await.unwrap().unwrap();
 
     let guest_book_message_outcome = guest_book_account
         .call(contract.id(), "add_message")

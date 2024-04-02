@@ -125,13 +125,7 @@ pub fn update_contract(&self) -> Promise {
 
 # Quickstart
 
-Clone this repository locally or open it in a codespace (see just below). 
-
-![create a codespace](./create_codespace.png)
-
-
-Then follow these steps:
-
+Clone this repository locally or open it in a codespace using the green `<> Code` button above. Then follow these steps:
 
 ### 0. Test the Contract
 Deploy your contract in a sandbox and simulate interactions from users.
