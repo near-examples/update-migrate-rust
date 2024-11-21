@@ -14,4 +14,7 @@ members = [
     "enum-updates/update",
     "self-updates/base",
     "self-updates/update",
+    "advanced-multi-version-updates/v1",
+    "advanced-multi-version-updates/v2",
+    "advanced-multi-version-updates/v3",
 ]
