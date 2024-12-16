@@ -1,4 +1,4 @@
-use near_sdk::NearToken;
+use near_workspaces::types::NearToken;
 use serde_json::json;
 use std::fs;
 
