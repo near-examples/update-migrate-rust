@@ -1,8 +1,8 @@
 use std::fs;
 
 use near_sdk::json_types::U128;
-use near_sdk::{AccountId, Gas};
-use near_workspaces::types::NearToken;
+use near_sdk::AccountId;
+use near_workspaces::types::{Gas, NearToken};
 use near_workspaces::Account;
 use near_workspaces::Contract;
 use rstest::{fixture, rstest};
