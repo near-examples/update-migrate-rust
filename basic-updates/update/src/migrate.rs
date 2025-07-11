@@ -19,22 +19,26 @@ impl GuestBook {
     #[init(ignore_state)]
     pub fn migrate() -> Self {
         // retrieve the current state from the contract
-        let old_state: OldState = env::state_read().expect("failed");
+        let mut old_state: OldState = env::state_read().expect("failed");
+
+        // reverse the messages to be able to pop payments keys during enumeration
+        let mut messages: Vec<OldPostedMessage> = old_state.messages.iter().collect();
+        messages.reverse();
+
+        // new messages vector to hold the migrated messages
+        let mut new_messages: Vector<PostedMessage> = Vector::new(MESSAGES_PREFIX);
 
         // iterate through the state migrating it to the new version
-        let mut new_messages: Vector<PostedMessage> = Vector::new(b"p");
+        for (_idx, posted) in messages.iter().enumerate() {
+            // get the payment and remove it from the old state payments vector so it won't be left in the new state
+            let payment = old_state.payments.pop().unwrap();
 
-        for (idx, posted) in old_state.messages.iter().enumerate() {
-            let payment = old_state
-                .payments
-                .get(idx as u64)
-                .unwrap_or(NearToken::from_near(0));
-
+            // push the new message to the new messages vector
             new_messages.push(&PostedMessage {
                 payment,
                 premium: posted.premium,
-                sender: posted.sender,
-                text: posted.text,
+                sender: posted.sender.clone(),
+                text: posted.text.clone(),
             })
         }
 
