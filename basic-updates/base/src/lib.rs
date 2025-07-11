@@ -7,6 +7,9 @@ use near_sdk::{env, AccountId, NearToken};
 
 const POINT_ONE: NearToken = NearToken::from_millinear(100);
 
+const MESSAGES_PREFIX: &[u8] = b"m";
+const PAYMENTS_PREFIX: &[u8] = b"p";
+
 #[near(serializers=[json, borsh])]
 pub struct PostedMessage {
     pub premium: bool,
@@ -23,8 +26,8 @@ pub struct GuestBook {
 impl Default for GuestBook {
     fn default() -> Self {
         Self {
-            messages: Vector::new(b"m"),
-            payments: Vector::new(b"p"),
+            messages: Vector::new(MESSAGES_PREFIX),
+            payments: Vector::new(PAYMENTS_PREFIX),
         }
     }
 }

@@ -1,13 +1,15 @@
 use near_sdk::near;
 
 use near_sdk::collections::Vector;
-use near_sdk::json_types::{U64, U128};
+use near_sdk::json_types::{U128, U64};
 
 use near_sdk::{env, AccountId, NearToken};
 
 mod migrate;
 
 const POINT_ONE: NearToken = NearToken::from_millinear(100);
+
+const MESSAGES_PREFIX: &[u8] = b"m";
 
 #[near(serializers=[json, borsh])]
 pub struct PostedMessage {
@@ -25,7 +27,7 @@ pub struct GuestBook {
 impl Default for GuestBook {
     fn default() -> Self {
         Self {
-            messages: Vector::new(b"m"),
+            messages: Vector::new(MESSAGES_PREFIX),
         }
     }
 }
