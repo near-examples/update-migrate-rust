@@ -172,16 +172,16 @@ async fn test_basic_updates_migration(
         messages_vec,
         vec![
             PostedMessage {
-                payment: ONE_TENTH_NEAR,
-                premium: true,
-                sender: base_contract.alice.id().clone(),
-                text: "bye".to_string(),
-            },
-            PostedMessage {
                 payment: NINE_HUNDREDTH_NEAR,
                 premium: false,
                 sender: base_contract.guest_book.id().clone(),
                 text: "hello".to_string(),
+            },
+            PostedMessage {
+                payment: ONE_TENTH_NEAR,
+                premium: true,
+                sender: base_contract.alice.id().clone(),
+                text: "bye".to_string(),
             },
         ]
     );
