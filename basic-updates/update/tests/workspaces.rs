@@ -23,7 +23,13 @@ async fn base_contract() -> Common {
     fs::create_dir_all("../../target/near/base").unwrap();
     let contract_wasm = near_workspaces::compile_project("../base").await.unwrap();
     let root = sandbox.root_account().unwrap();
-    let guest_book_account = root.create_subaccount("gbook").initial_balance(FIVE_NEAR).transact().await.unwrap().unwrap();
+    let guest_book_account = root
+        .create_subaccount("gbook")
+        .initial_balance(FIVE_NEAR)
+        .transact()
+        .await
+        .unwrap()
+        .unwrap();
 
     let contract = guest_book_account
         .deploy(&contract_wasm)
@@ -32,7 +38,13 @@ async fn base_contract() -> Common {
         .into_result()
         .unwrap();
 
-    let alice = root.create_subaccount("alice").initial_balance(FIVE_NEAR).transact().await.unwrap().unwrap();
+    let alice = root
+        .create_subaccount("alice")
+        .initial_balance(FIVE_NEAR)
+        .transact()
+        .await
+        .unwrap()
+        .unwrap();
 
     let guest_book_message_outcome = guest_book_account
         .call(contract.id(), "add_message")
