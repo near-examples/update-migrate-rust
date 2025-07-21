@@ -169,4 +169,4 @@ near account create-account sponsor-by-faucet-service <target-account-id> autoge
 
 # Learn More
 1. Learn more on each contract's `README`.
-2. Check [**our documentation**](https://docs.near.org/help).
+2. Check [**our documentation**](https://docs.near.org/tutorials/examples/advanced-xcc).
