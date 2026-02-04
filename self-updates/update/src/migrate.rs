@@ -1,4 +1,7 @@
-use crate::*;
+use near_sdk::store::Vector;
+use near_sdk::{env, near, AccountId, NearToken};
+
+use crate::{GuestBook, GuestBookExt, PostedMessage};
 
 #[near(serializers = [borsh])]
 pub struct OldPostedMessage {
@@ -27,15 +30,16 @@ impl GuestBook {
             // get the payment using the message index
             let payment = old_state
                 .payments
-                .get(idx as u64)
-                .unwrap_or(NearToken::from_near(0));
+                .get(idx as u32)
+                .unwrap_or(&NearToken::from_near(0))
+                .clone();
 
             // Create a PostedMessage with the new format and push it
-            new_messages.push(&PostedMessage {
+            new_messages.push(PostedMessage {
                 payment,
                 premium: posted.premium,
-                sender: posted.sender,
-                text: posted.text,
+                sender: posted.sender.clone(),
+                text: posted.text.clone(),
             })
         }
 

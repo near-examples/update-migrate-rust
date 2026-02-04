@@ -2,7 +2,7 @@ use std::fs;
 
 use near_api::{AccountId, NearToken};
 use near_sdk::json_types::U128;
-use near_sdk::serde_json::json;
+use serde_json::json;
 
 const ONE_TENTH_NEAR: NearToken = NearToken::from_millinear(100);
 const NINE_HUNDREDTH_NEAR: NearToken = NearToken::from_millinear(90);
@@ -14,8 +14,8 @@ async fn test_contract_is_operational() -> testresult::TestResult<()> {
     let sandbox_network =
         near_api::NetworkConfig::from_rpc_url("sandbox", sandbox.rpc_addr.parse()?);
 
-    fs::create_dir_all("../../target/near/base").unwrap();
-    fs::create_dir_all("../../target/near/update").unwrap();
+    fs::create_dir_all("../../target/near/self_base").unwrap();
+    fs::create_dir_all("../../target/near/self_update").unwrap();
 
     // Build the base contract wasm file
     let contract_wasm_path = cargo_near_build::build_with_cli(
@@ -31,6 +31,7 @@ async fn test_contract_is_operational() -> testresult::TestResult<()> {
 
     // Create accounts
     let alice = create_subaccount(&sandbox, "alice.sandbox").await?;
+    let bob = create_subaccount(&sandbox, "bob.sandbox").await?;
     let contract = create_subaccount(&sandbox, "gbook.sandbox")
         .await?
         .as_contract();
@@ -51,20 +52,20 @@ async fn test_contract_is_operational() -> testresult::TestResult<()> {
         .await?
         .assert_success();
 
-    #[derive(near_sdk::serde::Deserialize, Debug, PartialEq, Eq)]
-    #[serde(crate = "near_sdk::serde")]
-    pub struct PostedMessage {
-        pub premium: bool,
-        pub sender: AccountId,
-        pub text: String,
-    }
+    // Initialize the contract
+    let _ = contract
+        .call_function("init", json!({"manager": alice.account_id().to_string() }))
+        .transaction()
+        .with_signer(contract.account_id().clone(), signer.clone())
+        .send_to(&sandbox_network)
+        .await?
+        .assert_success();
 
-    // Test the base contract by adding messages
     let _ = contract
         .call_function("add_message", json!({"text": "hello"}))
         .transaction()
         .deposit(NINE_HUNDREDTH_NEAR)
-        .with_signer(contract.account_id().clone(), signer.clone())
+        .with_signer(bob.account_id().clone(), signer.clone())
         .send_to(&sandbox_network)
         .await?
         .assert_success();
@@ -78,6 +79,14 @@ async fn test_contract_is_operational() -> testresult::TestResult<()> {
         .await?
         .assert_success();
 
+    #[derive(near_sdk::serde::Deserialize, Debug, PartialEq, Eq)]
+    #[serde(crate = "near_sdk::serde")]
+    pub struct PostedMessage {
+        pub premium: bool,
+        pub sender: AccountId,
+        pub text: String,
+    }
+
     let messages_vec: Vec<PostedMessage> = contract
         .call_function("get_messages", json!({}))
         .read_only()
@@ -90,7 +99,7 @@ async fn test_contract_is_operational() -> testresult::TestResult<()> {
         vec![
             PostedMessage {
                 premium: false,
-                sender: contract.account_id().clone(),
+                sender: bob.account_id().clone(),
                 text: "hello".to_string(),
             },
             PostedMessage {
@@ -100,6 +109,7 @@ async fn test_contract_is_operational() -> testresult::TestResult<()> {
             },
         ]
     );
+
     let payments_vec: Vec<U128> = contract
         .call_function("get_payments", json!({}))
         .read_only()
@@ -115,26 +125,25 @@ async fn test_contract_is_operational() -> testresult::TestResult<()> {
         ]
     );
 
-    // Deploy the updated contract
-    near_api::Contract::deploy(contract.account_id().clone())
-        .use_code(updated_contract_wasm)
-        .without_init_call()
-        .with_signer(signer.clone())
-        .send_to(&sandbox_network)
-        .await?
-        .assert_success();
-
-    // Call the migrate function on the updated contract
+    // Manager updates the contract
     let _ = contract
-        .call_function("migrate", json!({}))
+        .call_function_raw("update_contract", updated_contract_wasm)
         .transaction()
-        .with_signer(contract.account_id().clone(), signer.clone())
+        .max_gas()
+        .with_signer(alice.account_id().clone(), signer.clone())
         .send_to(&sandbox_network)
         .await?
         .assert_success();
 
-    // Test the updated contract by getting messages
-    let messages_vec: Vec<PostedMessage> = contract
+    #[derive(near_sdk::serde::Deserialize, Debug, PartialEq, Eq)]
+    #[serde(crate = "near_sdk::serde")]
+    pub struct UpdatedPostedMessage {
+        pub payment: NearToken,
+        pub premium: bool,
+        pub sender: AccountId,
+        pub text: String,
+    }
+    let messages_vec: Vec<UpdatedPostedMessage> = contract
         .call_function("get_messages", json!({}))
         .read_only()
         .fetch_from(&sandbox_network)
@@ -144,12 +153,14 @@ async fn test_contract_is_operational() -> testresult::TestResult<()> {
     assert_eq!(
         messages_vec,
         vec![
-            PostedMessage {
+            UpdatedPostedMessage {
+                payment: NINE_HUNDREDTH_NEAR,
                 premium: false,
-                sender: contract.account_id().clone(),
+                sender: bob.account_id().clone(),
                 text: "hello".to_string(),
             },
-            PostedMessage {
+            UpdatedPostedMessage {
+                payment: ONE_TENTH_NEAR,
                 premium: true,
                 sender: alice.account_id().clone(),
                 text: "bye".to_string(),
