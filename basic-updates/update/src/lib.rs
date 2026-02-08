@@ -1,7 +1,7 @@
 use near_sdk::near;
 
-use near_sdk::collections::Vector;
 use near_sdk::json_types::{U128, U64};
+use near_sdk::store::Vector;
 
 use near_sdk::{env, AccountId, NearToken};
 
@@ -12,6 +12,7 @@ const POINT_ONE: NearToken = NearToken::from_millinear(100);
 const MESSAGES_PREFIX: &[u8] = b"m";
 
 #[near(serializers=[json, borsh])]
+#[derive(Clone)]
 pub struct PostedMessage {
     pub payment: NearToken,
     pub premium: bool,
@@ -45,7 +46,7 @@ impl GuestBook {
             premium,
             text,
         };
-        self.messages.push(&message);
+        self.messages.push(message);
     }
 
     pub fn get_messages(&self, from_index: Option<U128>, limit: Option<U64>) -> Vec<PostedMessage> {
@@ -53,8 +54,9 @@ impl GuestBook {
 
         self.messages
             .iter()
+            .cloned()
             .skip(from as usize)
             .take(u64::from(limit.unwrap_or(U64::from(10))) as usize)
-            .collect()
+            .collect::<Vec<PostedMessage>>()
     }
 }
