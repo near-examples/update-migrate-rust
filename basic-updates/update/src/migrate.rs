@@ -29,12 +29,12 @@ impl GuestBook {
             // get the payment and remove it from the old state payments vector so it won't be left in the new state
             let payment = old_state
                 .payments
-                .get(idx as u64)
+                .get(idx as u32)
                 .expect("failed to get payment")
                 .clone();
 
             // push the new message to the new messages vector
-            new_messages.push(&PostedMessage {
+            new_messages.push(PostedMessage {
                 payment,
                 premium: posted.premium,
                 sender: posted.sender.clone(),
