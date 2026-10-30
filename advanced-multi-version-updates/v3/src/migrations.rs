@@ -108,7 +108,7 @@ impl GuestBook {
         near_sdk::assert_self();
 
         let contract = env::input().expect("No contract code is attached in input");
-        Promise::new(env::current_account_id())
+        let _ = Promise::new(env::current_account_id())
             .deploy_contract(contract)
             .then(Promise::new(env::current_account_id()).function_call(
                 "unsafe_migrate".to_string(),

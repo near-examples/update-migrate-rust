@@ -1,6 +1,7 @@
 use crate::*;
 
 #[near(serializers=[borsh])]
+#[derive(Clone)]
 pub struct PostedMessageV1 {
     pub premium: bool,
     pub sender: AccountId,
@@ -8,6 +9,7 @@ pub struct PostedMessageV1 {
 }
 
 #[near(serializers=[borsh, json])]
+#[derive(Clone)]
 pub struct PostedMessageV2 {
     pub payment: NearToken,
     pub premium: bool,
@@ -16,6 +18,7 @@ pub struct PostedMessageV2 {
 }
 
 #[near(serializers=[borsh])]
+#[derive(Clone)]
 pub enum VersionedPostedMessage {
     V1(PostedMessageV1),
     V2(PostedMessageV2),

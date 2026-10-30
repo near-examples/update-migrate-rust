@@ -1,7 +1,7 @@
 use near_sdk::near;
 
-use near_sdk::collections::Vector;
 use near_sdk::json_types::{U128, U64};
+use near_sdk::store::Vector;
 
 use near_sdk::{env, AccountId, NearToken};
 
@@ -11,6 +11,7 @@ const MESSAGES_PREFIX: &[u8] = b"m";
 const PAYMENTS_PREFIX: &[u8] = b"p";
 
 #[near(serializers=[json, borsh])]
+#[derive(Clone)]
 pub struct PostedMessage {
     pub premium: bool,
     pub sender: AccountId,
@@ -45,8 +46,8 @@ impl GuestBook {
             sender,
             text,
         };
-        self.messages.push(&message);
-        self.payments.push(&payment);
+        self.messages.push(message);
+        self.payments.push(payment);
     }
 
     pub fn get_messages(&self, from_index: Option<U128>, limit: Option<U64>) -> Vec<PostedMessage> {
@@ -56,7 +57,8 @@ impl GuestBook {
             .iter()
             .skip(from as usize)
             .take(u64::from(limit.unwrap_or(U64::from(10))) as usize)
-            .collect()
+            .cloned()
+            .collect::<Vec<PostedMessage>>()
     }
 
     pub fn get_payments(&self, from_index: Option<U128>, limit: Option<U64>) -> Vec<U128> {
@@ -64,9 +66,10 @@ impl GuestBook {
 
         self.payments
             .iter()
+            .cloned()
             .skip(from as usize)
             .take(u64::from(limit.unwrap_or(U64::from(10))) as usize)
             .map(|x| U128(x.as_yoctonear()))
-            .collect()
+            .collect::<Vec<U128>>()
     }
 }

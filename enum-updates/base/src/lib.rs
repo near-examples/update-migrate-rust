@@ -1,7 +1,7 @@
 use near_sdk::near;
 
-use near_sdk::collections::Vector;
-use near_sdk::json_types::{U64, U128};
+use near_sdk::json_types::{U128, U64};
+use near_sdk::store::Vector;
 
 use near_sdk::{env, AccountId, NearToken};
 
@@ -35,7 +35,7 @@ impl GuestBook {
             premium,
             text,
         });
-        self.messages.push(&message);
+        self.messages.push(message);
     }
 
     pub fn get_messages(
@@ -49,7 +49,7 @@ impl GuestBook {
             .iter()
             .skip(from as usize)
             .take(u64::from(limit.unwrap_or(U64::from(10))) as usize)
-            .map(|message| message.into())
+            .map(|m| m.clone().into())
             .collect()
     }
 }
