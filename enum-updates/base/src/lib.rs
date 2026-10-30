@@ -1,7 +1,7 @@
 use near_sdk::near;
 
 use near_sdk::collections::Vector;
-use near_sdk::json_types::{U64, U128};
+use near_sdk::json_types::{U128, U64};
 
 use near_sdk::{env, AccountId, NearToken};
 

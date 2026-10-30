@@ -27,7 +27,9 @@ impl GuestBook {
         // iterate through the state migrating it to the new version
         for (idx, posted) in old_state.messages.iter().enumerate() {
             // get the payment and remove it from the old state payments vector so it won't be left in the new state
-            let payment = old_state.payments.get(idx as u64)
+            let payment = old_state
+                .payments
+                .get(idx as u64)
                 .expect("failed to get payment")
                 .clone();
 
