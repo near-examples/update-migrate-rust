@@ -1,5 +1,3 @@
-use std::fs;
-
 use near_api::{AccountId, NearToken};
 use near_sdk::json_types::U128;
 use near_sdk::serde_json::json;
@@ -9,25 +7,29 @@ const NINE_HUNDREDTH_NEAR: NearToken = NearToken::from_millinear(90);
 
 #[tokio::test]
 async fn test_contract_is_operational() -> testresult::TestResult<()> {
-    // Initialize the sandbox
-    let sandbox = near_sandbox::Sandbox::start_sandbox().await?;
-    let sandbox_network =
-        near_api::NetworkConfig::from_rpc_url("sandbox", sandbox.rpc_addr.parse()?);
-
-    fs::create_dir_all("../../target/near/base").unwrap();
-    fs::create_dir_all("../../target/near/update").unwrap();
-
     // Build the base contract wasm file
     let contract_wasm_path = cargo_near_build::build_with_cli(
         cargo_near_build::BuildOpts::builder()
             .manifest_path("../base/Cargo.toml")
+            .no_abi(true)
+            .no_embed_abi(true)
             .build(),
     )?;
     let contract_wasm = std::fs::read(contract_wasm_path)?;
 
     // Build the updated contract wasm file
-    let updated_contract_wasm_path = cargo_near_build::build_with_cli(Default::default())?;
+    let updated_contract_wasm_path =
+        cargo_near_build::build_with_cli(cargo_near_build::BuildOpts {
+            no_abi: true,
+            no_embed_abi: true,
+            ..Default::default()
+        })?;
     let updated_contract_wasm = std::fs::read(updated_contract_wasm_path)?;
+
+    // Start Sandbox after both Wasm builds have finished.
+    let sandbox = near_sandbox::Sandbox::start_sandbox().await?;
+    let sandbox_network =
+        near_api::NetworkConfig::from_rpc_url("sandbox", sandbox.rpc_addr.parse()?);
 
     // Create accounts
     let alice = create_subaccount(&sandbox, "alice.sandbox").await?;
@@ -133,8 +135,16 @@ async fn test_contract_is_operational() -> testresult::TestResult<()> {
         .await?
         .assert_success();
 
+    #[derive(near_sdk::serde::Deserialize, Debug, PartialEq, Eq)]
+    #[serde(crate = "near_sdk::serde")]
+    pub struct UpdatedPostedMessage {
+        pub payment: NearToken,
+        pub premium: bool,
+        pub sender: AccountId,
+        pub text: String,
+    }
     // Test the updated contract by getting messages
-    let messages_vec: Vec<PostedMessage> = contract
+    let messages_vec: Vec<UpdatedPostedMessage> = contract
         .call_function("get_messages", json!({}))
         .read_only()
         .fetch_from(&sandbox_network)
@@ -144,12 +154,14 @@ async fn test_contract_is_operational() -> testresult::TestResult<()> {
     assert_eq!(
         messages_vec,
         vec![
-            PostedMessage {
+            UpdatedPostedMessage {
+                payment: NINE_HUNDREDTH_NEAR,
                 premium: false,
                 sender: contract.account_id().clone(),
                 text: "hello".to_string(),
             },
-            PostedMessage {
+            UpdatedPostedMessage {
+                payment: ONE_TENTH_NEAR,
                 premium: true,
                 sender: alice.account_id().clone(),
                 text: "bye".to_string(),

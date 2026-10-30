@@ -128,10 +128,14 @@ pub fn update_contract(&self) -> Promise {
 Clone this repository locally or open it in a codespace using the green `<> Code` button above. Then follow these steps:
 
 ### 0. Test the Contract
-Deploy your contract in a sandbox and simulate interactions from users.
+The integration tests build the base and updated Wasm contracts from source, deploy them to local `near-sandbox` nodes, and exercise upgrades using `near-api`. They verify that messages and payments survive migration. Install the pinned Rust toolchain and `cargo-near` first:
 
 ```bash
-cargo test --workspace
+cargo install cargo-near --version 0.21.1 --locked --no-default-features
+```
+
+```bash
+cargo test --workspace --locked
 ```
 
 ### 1. Examples' cli-s versions

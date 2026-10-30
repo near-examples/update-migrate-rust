@@ -1,5 +1,3 @@
-use std::fs;
-
 use near_api::{AccountId, NearToken};
 use near_sdk::json_types::U128;
 use serde_json::json;
@@ -9,25 +7,29 @@ const NINE_HUNDREDTH_NEAR: NearToken = NearToken::from_millinear(90);
 
 #[tokio::test]
 async fn test_contract_is_operational() -> testresult::TestResult<()> {
-    // Initialize the sandbox
-    let sandbox = near_sandbox::Sandbox::start_sandbox().await?;
-    let sandbox_network =
-        near_api::NetworkConfig::from_rpc_url("sandbox", sandbox.rpc_addr.parse()?);
-
-    fs::create_dir_all("../../target/near/self_base").unwrap();
-    fs::create_dir_all("../../target/near/self_update").unwrap();
-
     // Build the base contract wasm file
     let contract_wasm_path = cargo_near_build::build_with_cli(
         cargo_near_build::BuildOpts::builder()
             .manifest_path("../base/Cargo.toml")
+            .no_abi(true)
+            .no_embed_abi(true)
             .build(),
     )?;
     let contract_wasm = std::fs::read(contract_wasm_path)?;
 
     // Build the updated contract wasm file
-    let updated_contract_wasm_path = cargo_near_build::build_with_cli(Default::default())?;
+    let updated_contract_wasm_path =
+        cargo_near_build::build_with_cli(cargo_near_build::BuildOpts {
+            no_abi: true,
+            no_embed_abi: true,
+            ..Default::default()
+        })?;
     let updated_contract_wasm = std::fs::read(updated_contract_wasm_path)?;
+
+    // Start Sandbox after both Wasm builds have finished.
+    let sandbox = near_sandbox::Sandbox::start_sandbox().await?;
+    let sandbox_network =
+        near_api::NetworkConfig::from_rpc_url("sandbox", sandbox.rpc_addr.parse()?);
 
     // Create accounts
     let alice = create_subaccount(&sandbox, "alice.sandbox").await?;
